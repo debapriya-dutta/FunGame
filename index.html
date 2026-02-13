@@ -1,0 +1,207 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Valentine?</title>
+  <style>
+    :root { --bg1:#ff9a9e; --bg2:#fad0c4; }
+    * { box-sizing: border-box; }
+    body{
+      margin:0;
+      height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background: linear-gradient(135deg, var(--bg1), var(--bg2));
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      overflow:hidden;
+    }
+    .card{
+      width:min(560px, 92vw);
+      background: rgba(255,255,255,.9);
+      border-radius: 24px;
+      padding: 28px 22px;
+      text-align:center;
+      box-shadow: 0 18px 50px rgba(0,0,0,.18);
+      position:relative;
+    }
+    h1{
+      margin:0 0 10px;
+      font-size: clamp(26px, 3.2vw, 38px);
+      color:#b0003a;
+      letter-spacing: .2px;
+    }
+    p{
+      margin:0 0 18px;
+      color:#333;
+      font-size: 16px;
+    }
+    .playground{
+      position:relative;
+      height: 220px;
+      margin-top: 8px;
+      border-radius: 18px;
+      background: radial-gradient(circle at top, rgba(255,0,85,.08), rgba(255,255,255,0));
+      overflow:hidden;
+    }
+    .btn{
+      border:0;
+      padding: 14px 22px;
+      border-radius: 14px;
+      font-weight: 700;
+      font-size: 16px;
+      cursor:pointer;
+      user-select:none;
+      touch-action:none;
+      position:absolute;
+      transition: transform .08s ease;
+    }
+    .btn:active{ transform: scale(.98); }
+    #yesBtn{
+      left: 32%;
+      top: 62%;
+      background:#24c16a;
+      color:white;
+      box-shadow: 0 12px 26px rgba(36,193,106,.35);
+    }
+    #noBtn{
+      left: 58%;
+      top: 62%;
+      background:#ff3b5c;
+      color:white;
+      box-shadow: 0 12px 26px rgba(255,59,92,.35);
+    }
+    .result{
+      margin-top: 16px;
+      font-size: 18px;
+      font-weight: 700;
+      color:#0d6b3a;
+      min-height: 26px;
+    }
+    .tiny{
+      margin-top: 10px;
+      font-size: 12px;
+      opacity: .65;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="card">
+    <h1>Will you be my Valentine? 💘</h1>
+    <p>Choose wisely 😄</p>
+
+    <div class="playground" id="playground" aria-label="valentine playground">
+      <button class="btn" id="yesBtn">Yes 💖</button>
+      <button class="btn" id="noBtn">No 🙈</button>
+    </div>
+
+    <div class="result" id="result"></div>
+    <div class="tiny">Tip: works on phone too — “No” tries to escape your finger!</div>
+  </div>
+
+<script>
+  const playground = document.getElementById('playground');
+  const noBtn = document.getElementById('noBtn');
+  const yesBtn = document.getElementById('yesBtn');
+  const result = document.getElementById('result');
+
+  // Helper: clamp value
+  const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
+
+  // Place "No" somewhere random inside playground
+  function moveNoButton(awayFromX = null, awayFromY = null) {
+    const pg = playground.getBoundingClientRect();
+    const nb = noBtn.getBoundingClientRect();
+
+    const padding = 10;
+    const maxX = pg.width - nb.width - padding;
+    const maxY = pg.height - nb.height - padding;
+
+    // Start with random position
+    let x = Math.random() * maxX + padding/2;
+    let y = Math.random() * maxY + padding/2;
+
+    // If cursor/touch position is provided, move further away from it
+    if (awayFromX !== null && awayFromY !== null) {
+      const relX = awayFromX - pg.left;
+      const relY = awayFromY - pg.top;
+
+      // Push away direction
+      const dx = (x - relX);
+      const dy = (y - relY);
+      const len = Math.hypot(dx, dy) || 1;
+
+      // "Escape distance" tune this for more/less slippery behavior
+      const escape = 120;
+      x = relX + (dx/len) * escape;
+      y = relY + (dy/len) * escape;
+
+      // Add small randomness so it feels playful
+      x += (Math.random() - 0.5) * 60;
+      y += (Math.random() - 0.5) * 60;
+    }
+
+    x = clamp(x, padding/2, maxX);
+    y = clamp(y, padding/2, maxY);
+
+    noBtn.style.left = `${x}px`;
+    noBtn.style.top  = `${y}px`;
+  }
+
+  // Initial placement (after layout)
+  window.addEventListener('load', () => moveNoButton());
+
+  // Make "No" run away on hover/mousemove near it
+  function handlePointerMove(e) {
+    // If pointer gets close to the "No" button, move it
+    const nb = noBtn.getBoundingClientRect();
+    const px = e.clientX;
+    const py = e.clientY;
+
+    const dist = Math.hypot(px - (nb.left + nb.width/2), py - (nb.top + nb.height/2));
+
+    // Sensitivity (smaller -> harder to catch)
+    if (dist < 130) moveNoButton(px, py);
+  }
+
+  playground.addEventListener('mousemove', handlePointerMove);
+
+  // Mobile support: finger hover equivalent
+  playground.addEventListener('touchmove', (e) => {
+    const t = e.touches[0];
+    if (!t) return;
+    handlePointerMove({ clientX: t.clientX, clientY: t.clientY });
+  }, { passive: true });
+
+  // If someone somehow taps "No", it still escapes
+  noBtn.addEventListener('pointerdown', (e) => {
+    e.preventDefault();
+    moveNoButton(e.clientX, e.clientY);
+  });
+
+  // Yes button result
+  yesBtn.addEventListener('click', () => {
+    result.textContent = "Yayyyy! 💞 Sending you a big hug 🤗";
+    // Optional: confetti-ish effect using emojis
+    for (let i = 0; i < 18; i++) {
+      const s = document.createElement('span');
+      s.textContent = ['💖','✨','💘','🌸','😍'][Math.floor(Math.random()*5)];
+      s.style.position = 'fixed';
+      s.style.left = (Math.random()*100) + 'vw';
+      s.style.top = '-5vh';
+      s.style.fontSize = (16 + Math.random()*18) + 'px';
+      s.style.transition = 'transform 1.2s linear, opacity 1.2s linear';
+      document.body.appendChild(s);
+      requestAnimationFrame(() => {
+        s.style.transform = `translateY(110vh) rotate(${Math.random()*360}deg)`;
+        s.style.opacity = '0';
+      });
+      setTimeout(() => s.remove(), 1300);
+    }
+  });
+</script>
+</body>
+</html>
