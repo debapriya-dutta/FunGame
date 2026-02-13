@@ -1,118 +1,558 @@
-
 <!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Valentine?</title>
+  <title>No escape</title>
   <style>
-    :root { --bg1:#ff9a9e; --bg2:#fad0c4; }
-    * { box-sizing: border-box; }
+    :root{
+      --bg1:#ff9a9e;
+      --bg2:#fad0c4;
+      --bg3:#fbc2eb;
+      --card:rgba(255,255,255,.92);
+      --text:#2b2b2b;
+      --muted:rgba(0,0,0,.62);
+      --yes:#358717; /* improved contrast green */ /* [1](https://microsoft.sharepoint.com/teams/STCARelevane/WPR/_layouts/15/Doc.aspx?sourcedoc=%7B35FC2306-C640-40D4-AED8-18F9C9DAF83B%7D&file=FY25%20PA%20Uber%20Deck.pptx&action=edit&mobileredirect=true&DefaultItemOpen=1) */
+      --no:#ff3b5c;
+      --shadow:0 22px 60px rgba(0,0,0,.18);
+      --ring:0 0 0 4px rgba(255,59,92,.22);
+    }
+
+    *{box-sizing:border-box}
     body{
       margin:0;
       height:100vh;
       display:flex;
       align-items:center;
       justify-content:center;
-      background: linear-gradient(135deg, var(--bg1), var(--bg2));
       font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      color:var(--text);
       overflow:hidden;
+      background:
+        radial-gradient(1200px 800px at 15% 10%, rgba(255,255,255,.35), transparent 55%),
+        radial-gradient(900px 650px at 85% 20%, rgba(255,255,255,.25), transparent 55%),
+        linear-gradient(135deg, var(--bg1), var(--bg2), var(--bg3));
+      background-size: 100% 100%;
     }
+
+    /* floating background hearts */
+    .bg-heart{
+      position:fixed;
+      left:0; top:0;
+      pointer-events:none;
+      opacity:.0;
+      transform:translateY(0) scale(1);
+      animation: bgFloat 10s linear forwards;
+      filter: drop-shadow(0 10px 15px rgba(0,0,0,.08));
+      will-change: transform, opacity;
+    }
+    @keyframes bgFloat{
+      0%{ opacity:0; transform:translateY(20vh) scale(.8) rotate(-10deg); }
+      10%{opacity:.35}
+      90%{opacity:.18}
+      100%{ opacity:0; transform:translateY(-120vh) scale(1.2) rotate(20deg); }
+    }
+
     .card{
-      width:min(560px, 92vw);
-      background: rgba(255,255,255,.9);
-      border-radius: 24px;
-      padding: 28px 22px;
-      text-align:center;
-      box-shadow: 0 18px 50px rgba(0,0,0,.18);
+      width:min(720px, 92vw);
+      background:var(--card);
+      border-radius:26px;
+      padding:28px 22px 22px;
+      box-shadow:var(--shadow);
       position:relative;
+      overflow:hidden;
+      border:1px solid rgba(0,0,0,.05);
     }
+
+    /* cute shimmer */
+    .card::before{
+      content:"";
+      position:absolute; inset:-80px;
+      background: linear-gradient(110deg, transparent 20%, rgba(255,255,255,.55) 35%, transparent 55%);
+      transform: translateX(-60%);
+      animation: shimmer 5.5s ease-in-out infinite;
+      pointer-events:none;
+    }
+    @keyframes shimmer{
+      0%{ transform:translateX(-65%) rotate(8deg); opacity:.2; }
+      45%{ opacity:.35; }
+      100%{ transform:translateX(65%) rotate(8deg); opacity:.2; }
+    }
+
+    header{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:12px;
+      position:relative;
+      z-index:2;
+    }
+
+    .titleWrap{flex:1}
     h1{
-      margin:0 0 10px;
-      font-size: clamp(26px, 3.2vw, 38px);
-      color:#b0003a;
-      letter-spacing: .2px;
+      margin:0 0 6px;
+      font-size: clamp(26px, 3.2vw, 42px);
+      letter-spacing:.2px;
+      line-height:1.1;
     }
-    p{
-      margin:0 0 18px;
-      color:#333;
-      font-size: 16px;
+    .subtitle{
+      margin:0;
+      font-size:15px;
+      color:var(--muted);
     }
+
+    .pillRow{
+      margin-top:10px;
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      align-items:center;
+      justify-content:center;
+      position:relative;
+      z-index:2;
+    }
+
+    .pill{
+      font-size:12px;
+      padding:7px 10px;
+      border-radius:999px;
+      background:rgba(255,255,255,.75);
+      border:1px solid rgba(0,0,0,.06);
+      color:rgba(0,0,0,.65);
+      backdrop-filter: blur(8px);
+    }
+
+    .controls{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      justify-content:flex-end;
+      position:relative;
+      z-index:3;
+    }
+    .iconBtn{
+      width:42px; height:42px;
+      border-radius:14px;
+      border:1px solid rgba(0,0,0,.08);
+      background:rgba(255,255,255,.75);
+      cursor:pointer;
+      display:grid;
+      place-items:center;
+      box-shadow: 0 10px 20px rgba(0,0,0,.08);
+      user-select:none;
+      -webkit-tap-highlight-color: transparent;
+      transition: transform .12s ease, box-shadow .12s ease;
+    }
+    .iconBtn:active{ transform: scale(.98); }
+    .iconBtn:focus-visible{ outline:none; box-shadow: var(--ring), 0 10px 20px rgba(0,0,0,.08); }
+
+    .icon{
+      font-size:18px;
+      transform: translateY(-1px);
+    }
+
     .playground{
       position:relative;
-      height: 220px;
-      margin-top: 8px;
-      border-radius: 18px;
-      background: radial-gradient(circle at top, rgba(255,0,85,.08), rgba(255,255,255,0));
+      height:260px;
+      margin-top:14px;
+      border-radius:20px;
+      background:
+        radial-gradient(500px 280px at 25% 25%, rgba(255,59,92,.14), transparent 60%),
+        radial-gradient(500px 300px at 75% 20%, rgba(53,135,23,.12), transparent 62%),
+        radial-gradient(900px 420px at 50% 120%, rgba(255,255,255,.65), rgba(255,255,255,.0)),
+        rgba(255,255,255,.55);
       overflow:hidden;
+      border:1px solid rgba(0,0,0,.07);
+      z-index:2;
     }
+
     .btn{
       border:0;
-      padding: 14px 22px;
-      border-radius: 14px;
-      font-weight: 700;
-      font-size: 16px;
+      padding:14px 22px;
+      border-radius:16px;
+      font-weight:800;
+      font-size:16px;
       cursor:pointer;
       user-select:none;
       touch-action:none;
       position:absolute;
-      transition: transform .08s ease;
+      transition: transform .08s ease, filter .12s ease, box-shadow .12s ease;
+      will-change: left, top, transform;
     }
     .btn:active{ transform: scale(.98); }
-    #yesBtn{
-      left: 32%;
-      top: 62%;
-      background:#24c16a;
+    .btn:focus-visible{ outline:none; box-shadow: var(--ring); }
+
+    .yesBtn{
+      left:30%;
+      top:64%;
+      background:var(--yes);
       color:white;
-      box-shadow: 0 12px 26px rgba(36,193,106,.35);
+      box-shadow:0 14px 30px rgba(53,135,23,.28);
     }
-    #noBtn{
-      left: 58%;
-      top: 62%;
-      background:#ff3b5c;
+    .noBtn{
+      left:58%;
+      top:64%;
+      background:var(--no);
       color:white;
-      box-shadow: 0 12px 26px rgba(255,59,92,.35);
+      box-shadow:0 14px 30px rgba(255,59,92,.28);
     }
+
     .result{
-      margin-top: 16px;
-      font-size: 18px;
-      font-weight: 700;
-      color:#0d6b3a;
-      min-height: 26px;
+      margin-top:12px;
+      min-height:28px;
+      font-size:18px;
+      font-weight:800;
+      position:relative;
+      z-index:2;
     }
-    .tiny{
-      margin-top: 10px;
-      font-size: 12px;
-      opacity: .65;
+    .hint{
+      margin-top:6px;
+      font-size:12px;
+      color:rgba(0,0,0,.55);
+      position:relative;
+      z-index:2;
+    }
+
+    .toast{
+      position:absolute;
+      left:50%;
+      top:14px;
+      transform:translateX(-50%);
+      background:rgba(0,0,0,.75);
+      color:#fff;
+      padding:8px 12px;
+      border-radius:12px;
+      font-size:13px;
+      opacity:0;
+      pointer-events:none;
+      transition: opacity .18s ease, transform .18s ease;
+      z-index:50;
+      white-space:nowrap;
+    }
+    .toast.show{ opacity:1; transform:translateX(-50%) translateY(2px); }
+
+    /* celebration */
+    .heartBurst{
+      position:fixed;
+      pointer-events:none;
+      animation: heartUp 1.35s ease forwards;
+      will-change: transform, opacity;
+      filter: drop-shadow(0 10px 14px rgba(0,0,0,.1));
+    }
+    @keyframes heartUp{
+      0%{ transform: translateY(0) scale(1); opacity:1; }
+      100%{ transform: translateY(-110vh) rotate(240deg) scale(1.15); opacity:0; }
+    }
+    .confetti{
+      position:fixed;
+      width:10px; height:10px;
+      pointer-events:none;
+      opacity:1;
+      animation: fall 1.25s linear forwards;
+      will-change: transform, opacity;
+    }
+    @keyframes fall{
+      0%{ transform: translateY(0) rotate(0deg); opacity:1; }
+      100%{ transform: translateY(110vh) rotate(720deg); opacity:0; }
+    }
+
+    /* love letter modal */
+    .modal{
+      position:fixed;
+      inset:0;
+      background:rgba(0,0,0,.45);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding:18px;
+      z-index:999;
+    }
+    .modal.show{ display:flex; }
+    .letter{
+      width:min(640px, 96vw);
+      border-radius:22px;
+      background:rgba(255,255,255,.95);
+      box-shadow: 0 28px 80px rgba(0,0,0,.24);
+      overflow:hidden;
+      border:1px solid rgba(0,0,0,.08);
+    }
+    .letterTop{
+      padding:16px 16px 10px;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+      background:
+        radial-gradient(550px 220px at 10% 0%, rgba(255,59,92,.18), transparent 65%),
+        radial-gradient(500px 240px at 90% 0%, rgba(53,135,23,.14), transparent 70%),
+        rgba(255,255,255,.65);
+      border-bottom:1px solid rgba(0,0,0,.06);
+    }
+    .letterTitle{
+      font-weight:900;
+      letter-spacing:.2px;
+    }
+    .closeBtn{
+      border:0;
+      border-radius:14px;
+      padding:10px 12px;
+      cursor:pointer;
+      background:rgba(0,0,0,.06);
+      font-weight:800;
+    }
+    .letterBody{
+      padding:14px 16px 16px;
+      color:rgba(0,0,0,.78);
+      line-height:1.5;
+      font-size:15px;
+    }
+    .mediaRow{
+      margin-top:12px;
+      display:grid;
+      grid-template-columns: 120px 1fr;
+      gap:12px;
+      align-items:center;
+    }
+    .photo{
+      width:120px; height:120px;
+      border-radius:18px;
+      overflow:hidden;
+      border:1px solid rgba(0,0,0,.08);
+      background: radial-gradient(circle at 30% 30%, rgba(255,59,92,.25), rgba(255,255,255,.0));
+      display:grid;
+      place-items:center;
+      font-size:42px;
+    }
+    .photo img{
+      width:100%; height:100%;
+      object-fit:cover;
+      display:none;
+    }
+    .ctaRow{
+      margin-top:14px;
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+    }
+    .cta{
+      border:0;
+      border-radius:16px;
+      padding:12px 14px;
+      font-weight:900;
+      cursor:pointer;
+      background:rgba(0,0,0,.06);
+    }
+    .cta.primary{
+      background: var(--no);
+      color:white;
+      box-shadow:0 14px 30px rgba(255,59,92,.25);
+    }
+
+    /* reduce motion friendly */
+    @media (prefers-reduced-motion: reduce){
+      .card::before, .bg-heart, .heartBurst, .confetti{ animation: none !important; }
+      .btn{ transition:none !important; }
     }
   </style>
 </head>
-
 <body>
-  <div class="card">
-    <h1>Will you be my Valentine? 💘</h1>
-    <p>Choose wisely 😄</p>
+  <div class="card" role="application" aria-label="Valentine page">
+    <div class="toast" id="toast" aria-live="polite"></div>
 
-    <div class="playground" id="playground" aria-label="valentine playground">
-      <button class="btn" id="yesBtn">Yes 💖</button>
-      <button class="btn" id="noBtn">No 🙈</button>
+    <header>
+      <div class="titleWrap">
+        <h1 id="title">My Valentine?</h1>
+        <p class="subtitle" id="subtitle">I made this tiny page just for you 💌</p>
+      </div>
+
+      <div class="controls">
+        <button class="iconBtn" id="musicBtn" aria-label="Toggle music">
+          <span class="icon" id="musicIcon">🎵</span>
+        </button>
+        <button class="iconBtn" id="resetBtn" aria-label="Reset page">
+          <span class="icon">🔁</span>
+        </button>
+      </div>
+    </header>
+
+    <div class="pillRow">
+      <span class="pill" id="countdown">Valentine starts in …</span>
+      <span class="pill" id="triesPill">No tries: 0</span>
+      <span class="pill" id="statusPill">Status: pending</span>
+    </div>
+
+    <div class="playground" id="playground" aria-label="Buttons area">
+      <button class="btn yesBtn" id="yesBtn">YES 💖</button>
+      <button class="btn noBtn" id="noBtn">NO 🙈</button>
     </div>
 
     <div class="result" id="result"></div>
-    <div class="tiny">Tip: works on phone too — “No” tries to escape your finger!</div>
+    <div class="hint" id="hint">Tip: On mobile, try tapping “NO”… if you can 😄</div>
+  </div>
+
+  <!-- Love letter modal -->
+  <div class="modal" id="modal" aria-hidden="true">
+    <div class="letter" role="dialog" aria-label="Love letter">
+      <div class="letterTop">
+        <div class="letterTitle" id="letterTitle">A tiny love letter 💌</div>
+        <button class="closeBtn" id="closeModal" aria-label="Close letter">Close</button>
+      </div>
+      <div class="letterBody">
+        <div id="letterText">
+          You just made my whole day. Thank you for choosing “YES” —
+          I hope we make a thousand sweet memories together. 🌷✨
+        </div>
+
+        <div class="mediaRow">
+          <div class="photo" id="photoBox" aria-label="Photo or gif reveal">
+            <img id="photoImg" alt="Photo" />
+            <span id="photoFallback">💞</span>
+          </div>
+          <div>
+            <div style="font-weight:900; margin-bottom:6px;">PS:</div>
+            <div id="psLine">If you’re smiling right now, my mission is complete 😌</div>
+          </div>
+        </div>
+
+        <div class="ctaRow">
+          <button class="cta" id="copyBtn">Copy this link 🔗</button>
+          <button class="cta primary" id="shareBtn">Share 💌</button>
+        </div>
+      </div>
+    </div>
   </div>
 
 <script>
-  const playground = document.getElementById('playground');
-  const noBtn = document.getElementById('noBtn');
-  const yesBtn = document.getElementById('yesBtn');
-  const result = document.getElementById('result');
+  // ---------- Personalization (link params) ----------
+  const qs = new URLSearchParams(location.search);
+  const name = (qs.get("name") || "").trim();
+  const customMsg = (qs.get("msg") || "").trim(); // optional: ?msg=...
+  const customPS = (qs.get("ps") || "").trim();   // optional: ?ps=...
+  const photoSrc = (qs.get("photo") || "").trim(); // optional: ?photo=photo.jpg
 
-  // Helper: clamp value
+  const title = document.getElementById("title");
+  const subtitle = document.getElementById("subtitle");
+  const result = document.getElementById("result");
+  const hint = document.getElementById("hint");
+  const countdownEl = document.getElementById("countdown");
+  const triesPill = document.getElementById("triesPill");
+  const statusPill = document.getElementById("statusPill");
+
+  const yesBtn = document.getElementById("yesBtn");
+  const noBtn = document.getElementById("noBtn");
+  const playground = document.getElementById("playground");
+
+  const toast = document.getElementById("toast");
+
+  const modal = document.getElementById("modal");
+  const closeModal = document.getElementById("closeModal");
+  const letterTitle = document.getElementById("letterTitle");
+  const letterText = document.getElementById("letterText");
+  const psLine = document.getElementById("psLine");
+  const photoImg = document.getElementById("photoImg");
+  const photoFallback = document.getElementById("photoFallback");
+  const copyBtn = document.getElementById("copyBtn");
+  const shareBtn = document.getElementById("shareBtn");
+
+  const musicBtn = document.getElementById("musicBtn");
+  const musicIcon = document.getElementById("musicIcon");
+  const resetBtn = document.getElementById("resetBtn");
+
+  const STORE_KEY = "valentine_yes_v2";
+
+  // Title/subtitle personalization
+  if (name) {
+    title.textContent = `${name}, will you be my Valentine?`;
+    subtitle.textContent = `Hey ${name}… I have a tiny question 🥹`;
+    letterTitle.textContent = `For ${name} 💌`;
+  }
+
+  // Love letter text personalization
+  if (customMsg) letterText.textContent = customMsg;
+  if (customPS) psLine.textContent = customPS;
+
+  // Optional photo: default file name you can add to repo
+  // If user provides ?photo=..., use it; else try "photo.jpg" silently
+  const tryPhoto = photoSrc || "photo.jpg";
+  photoImg.src = tryPhoto;
+  photoImg.onload = () => { photoImg.style.display = "block"; photoFallback.style.display = "none"; };
+  photoImg.onerror = () => { /* fallback stays */ };
+
+  // ---------- Cute countdown (next Feb 14) ----------
+  function nextValentineDate() {
+    const now = new Date();
+    const y = now.getFullYear();
+    let target = new Date(y, 1, 14, 0, 0, 0); // Feb=1
+    if (now > target) target = new Date(y + 1, 1, 14, 0, 0, 0);
+    return target;
+  }
+  function formatCountdown(ms) {
+    const s = Math.max(0, Math.floor(ms / 1000));
+    const d = Math.floor(s / 86400);
+    const h = Math.floor((s % 86400) / 3600);
+    const m = Math.floor((s % 3600) / 60);
+    const ss = s % 60;
+    const parts = [];
+    if (d) parts.push(`${d}d`);
+    parts.push(`${h}h`, `${m}m`, `${ss}s`);
+    return parts.join(" ");
+  }
+  function tickCountdown() {
+    const t = nextValentineDate();
+    const now = new Date();
+    const diff = t - now;
+    countdownEl.textContent = diff > 0 ? `Valentine starts in ${formatCountdown(diff)} 💝` : `Happy Valentine’s Day! 💘`;
+  }
+  tickCountdown();
+  setInterval(tickCountdown, 1000);
+
+  // ---------- Toast helper ----------
+  let toastTimer = null;
+  function showToast(msg) {
+    if (!msg) return;
+    toast.textContent = msg;
+    toast.classList.add("show");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toast.classList.remove("show"), 850);
+  }
+
+  // ---------- Background floating hearts ----------
+  const bgHearts = ["💗","💖","💘","💝","💞","🌸"];
+  function spawnBgHeart() {
+    // Reduce motion preference: stop spawning
+    if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const el = document.createElement("div");
+    el.className = "bg-heart";
+    el.textContent = bgHearts[Math.floor(Math.random()*bgHearts.length)];
+    el.style.left = (Math.random()*100) + "vw";
+    el.style.top = (80 + Math.random()*30) + "vh";
+    el.style.fontSize = (16 + Math.random()*20) + "px";
+    el.style.opacity = "0";
+    el.style.animationDuration = (8 + Math.random()*6) + "s";
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 14000);
+  }
+  setInterval(spawnBgHeart, 650);
+
+  // ---------- Runaway NO button ----------
+  let noTries = 0;
+  const tease = [
+    "Oops 😇",
+    "Nice try 😌",
+    "Hehe… not today 💞",
+    "I’m shy 🙈",
+    "Too slow 😄",
+    "Are you sure? 🥺",
+    "Try YES instead 😘",
+    "Okay okay… you’re persistent 😳",
+    "One more time? 😅",
+    "Fine… I’m getting tired 😵‍💫"
+  ];
+
   const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
 
-  // Place "No" somewhere random inside playground
-  function moveNoButton(awayFromX = null, awayFromY = null) {
+  function moveNoButton(awayX=null, awayY=null, force=false) {
     const pg = playground.getBoundingClientRect();
     const nb = noBtn.getBoundingClientRect();
 
@@ -120,88 +560,243 @@
     const maxX = pg.width - nb.width - padding;
     const maxY = pg.height - nb.height - padding;
 
-    // Start with random position
     let x = Math.random() * maxX + padding/2;
     let y = Math.random() * maxY + padding/2;
 
-    // If cursor/touch position is provided, move further away from it
-    if (awayFromX !== null && awayFromY !== null) {
-      const relX = awayFromX - pg.left;
-      const relY = awayFromY - pg.top;
-
-      // Push away direction
-      const dx = (x - relX);
-      const dy = (y - relY);
+    // push away from pointer if provided
+    if (awayX != null && awayY != null) {
+      const relX = awayX - pg.left;
+      const relY = awayY - pg.top;
+      const dx = x - relX;
+      const dy = y - relY;
       const len = Math.hypot(dx, dy) || 1;
 
-      // "Escape distance" tune this for more/less slippery behavior
-      const escape = 120;
-      x = relX + (dx/len) * escape;
-      y = relY + (dy/len) * escape;
+      // escape distance grows slightly with tries
+      const escape = 120 + Math.min(80, noTries * 6);
+      x = relX + (dx/len)*escape + (Math.random()-0.5)*70;
+      y = relY + (dy/len)*escape + (Math.random()-0.5)*70;
 
-      // Add small randomness so it feels playful
-      x += (Math.random() - 0.5) * 60;
-      y += (Math.random() - 0.5) * 60;
+      x = clamp(x, padding, maxX);
+      y = clamp(y, padding, maxY);
     }
 
-    x = clamp(x, padding/2, maxX);
-    y = clamp(y, padding/2, maxY);
+    // When tries are high, slow down a bit so user can finish the story
+    if (noTries >= 10 && !force) {
+      // pull it closer to center a little
+      x = (x + pg.width*0.45)/2;
+      y = (y + pg.height*0.55)/2;
+    }
 
-    noBtn.style.left = `${x}px`;
-    noBtn.style.top  = `${y}px`;
+    noBtn.style.left = x + "px";
+    noBtn.style.top  = y + "px";
   }
 
-  // Initial placement (after layout)
-  window.addEventListener('load', () => moveNoButton());
+  window.addEventListener("load", () => moveNoButton(null, null, true));
 
-  // Make "No" run away on hover/mousemove near it
   function handlePointerMove(e) {
-    // If pointer gets close to the "No" button, move it
+    if (isYesLocked()) return;
     const nb = noBtn.getBoundingClientRect();
-    const px = e.clientX;
-    const py = e.clientY;
+    const px = e.clientX, py = e.clientY;
+    const cx = nb.left + nb.width/2;
+    const cy = nb.top  + nb.height/2;
+    const dist = Math.hypot(px - cx, py - cy);
 
-    const dist = Math.hypot(px - (nb.left + nb.width/2), py - (nb.top + nb.height/2));
-
-    // Sensitivity (smaller -> harder to catch)
+    // sensitivity
     if (dist < 130) moveNoButton(px, py);
   }
 
-  playground.addEventListener('mousemove', handlePointerMove);
-
-  // Mobile support: finger hover equivalent
-  playground.addEventListener('touchmove', (e) => {
-    const t = e.touches[0];
+  playground.addEventListener("mousemove", handlePointerMove);
+  playground.addEventListener("touchmove", (e) => {
+    const t = e.touches && e.touches[0];
     if (!t) return;
     handlePointerMove({ clientX: t.clientX, clientY: t.clientY });
-  }, { passive: true });
+  }, { passive:true });
 
-  // If someone somehow taps "No", it still escapes
-  noBtn.addEventListener('pointerdown', (e) => {
+  // NO button tap -> tease, move away, and eventually "gives up"
+  noBtn.addEventListener("pointerdown", (e) => {
+    if (isYesLocked()) return;
     e.preventDefault();
+    noTries++;
+    triesPill.textContent = `No tries: ${noTries}`;
+    showToast(tease[Math.min(tease.length-1, noTries-1)]);
+
+    // evolve behavior
+    if (noTries === 6) hint.textContent = "Tip: Your persistence is cute 😳";
+    if (noTries === 10) hint.textContent = "Okay… the NO button is getting tired 😅";
+    if (noTries >= 12) {
+      // surrender: NO becomes YES-ish
+      noBtn.textContent = "Okay… YES 🥹";
+      noBtn.style.background = "linear-gradient(135deg, #ff3b5c, #ff7aa0)";
+      noBtn.style.boxShadow = "0 14px 30px rgba(255,59,92,.30)";
+      showToast("Alright… you win 😌💘");
+      // Next tap on it triggers YES
+      noBtn.addEventListener("click", triggerYesOnce, { once:true });
+    }
+
     moveNoButton(e.clientX, e.clientY);
   });
 
-  // Yes button result
-  yesBtn.addEventListener('click', () => {
-    result.textContent = "Yayyyy! 💞 Sending you a big hug 🤗";
-    // Optional: confetti-ish effect using emojis
-    for (let i = 0; i < 18; i++) {
-      const s = document.createElement('span');
-      s.textContent = ['💖','✨','💘','🌸','😍'][Math.floor(Math.random()*5)];
-      s.style.position = 'fixed';
-      s.style.left = (Math.random()*100) + 'vw';
-      s.style.top = '-5vh';
-      s.style.fontSize = (16 + Math.random()*18) + 'px';
-      s.style.transition = 'transform 1.2s linear, opacity 1.2s linear';
-      document.body.appendChild(s);
-      requestAnimationFrame(() => {
-        s.style.transform = `translateY(110vh) rotate(${Math.random()*360}deg)`;
-        s.style.opacity = '0';
-      });
-      setTimeout(() => s.remove(), 1300);
+  // ---------- YES flow + persistence ----------
+  function isYesLocked() {
+    return localStorage.getItem(STORE_KEY) === "1";
+  }
+
+  function setYesLocked() {
+    localStorage.setItem(STORE_KEY, "1");
+  }
+
+  function clearYesLocked() {
+    localStorage.removeItem(STORE_KEY);
+  }
+
+  function triggerYesOnce() {
+    if (isYesLocked()) return;
+    triggerYes();
+  }
+
+  yesBtn.addEventListener("click", triggerYesOnce);
+
+  function triggerYes() {
+    setYesLocked();
+    statusPill.textContent = "Status: YES 💖";
+    result.textContent = name ? `YAY! ${name} said YES 💞` : "YAY! You said YES 💞";
+    result.style.color = "#0d6b3a";
+    hint.textContent = "You just unlocked the love letter 💌";
+
+    // freeze NO so it stops escaping
+    noBtn.style.pointerEvents = "none";
+    noBtn.style.filter = "grayscale(.25)";
+
+    // confetti + hearts
+    launchConfetti();
+    heartBurst();
+
+    // open love letter
+    openModal();
+
+    // subtle sparkle background
+    for (let i=0;i<6;i++) spawnBgHeart();
+  }
+
+  function heartBurst() {
+    const emojis = ["💖","💞","💘","💝","🌷","✨"];
+    for (let i=0;i<22;i++){
+      const h = document.createElement("div");
+      h.className = "heartBurst";
+      h.textContent = emojis[Math.floor(Math.random()*emojis.length)];
+      h.style.left = (Math.random()*100) + "vw";
+      h.style.top = (78 + Math.random()*18) + "vh";
+      h.style.fontSize = (16 + Math.random()*22) + "px";
+      h.style.animationDuration = (1.05 + Math.random()*0.55) + "s";
+      document.body.appendChild(h);
+      setTimeout(() => h.remove(), 1600);
+    }
+  }
+
+  function launchConfetti() {
+    const colors = ["#ff3b5c","#358717","#ffd166","#6c63ff","#00c2ff","#ff8fab"];
+    for (let i=0;i<44;i++){
+      const c = document.createElement("div");
+      c.className = "confetti";
+      c.style.left = (Math.random()*100) + "vw";
+      c.style.top = (-6 - Math.random()*12) + "vh";
+      c.style.background = colors[Math.floor(Math.random()*colors.length)];
+      c.style.borderRadius = (Math.random()>.5 ? "2px" : "999px");
+      c.style.width = (8 + Math.random()*8) + "px";
+      c.style.height = (8 + Math.random()*10) + "px";
+      c.style.animationDuration = (1.0 + Math.random()*0.6) + "s";
+      document.body.appendChild(c);
+      setTimeout(() => c.remove(), 1700);
+    }
+  }
+
+  // ---------- Modal ----------
+  function openModal(){
+    modal.classList.add("show");
+    modal.setAttribute("aria-hidden","false");
+  }
+  function closeLoveLetter(){
+    modal.classList.remove("show");
+    modal.setAttribute("aria-hidden","true");
+  }
+  closeModal.addEventListener("click", closeLoveLetter);
+  modal.addEventListener("click", (e) => { if (e.target === modal) closeLoveLetter(); });
+
+  // ---------- Share / copy link ----------
+  function buildShareLink() {
+    // Keep name/msg/ps/photo params, but drop reset
+    const u = new URL(location.href);
+    u.searchParams.delete("reset");
+    return u.toString();
+  }
+
+  copyBtn.addEventListener("click", async () => {
+    const link = buildShareLink();
+    try{
+      await navigator.clipboard.writeText(link);
+      showToast("Link copied 💌");
+    }catch{
+      // fallback
+      prompt("Copy this link:", link);
     }
   });
-</script>
-</body>
-</html>
+
+  shareBtn.addEventListener("click", async () => {
+    const link = buildShareLink();
+    const shareData = { title: "My Valentine?", text: "I have a tiny question 💞", url: link };
+    if (navigator.share) {
+      try { await navigator.share(shareData); }
+      catch { /* user canceled */ }
+    } else {
+      try{
+        await navigator.clipboard.writeText(link);
+        showToast("Link copied 💌");
+      }catch{
+        prompt("Copy this link:", link);
+      }
+    }
+  });
+
+  // ---------- Reset button ----------
+  resetBtn.addEventListener("click", () => {
+    clearYesLocked();
+    // keep personalization params
+    showToast("Reset done 🔁");
+    setTimeout(() => location.reload(), 250);
+  });
+
+  // ---------- Restore state if already YES ----------
+  if (isYesLocked()) {
+    statusPill.textContent = "Status: YES 💖";
+    result.textContent = name ? `Still YES 💞 (Welcome back, ${name}!)` : "Still YES 💞 (Welcome back!)";
+    result.style.color = "#0d6b3a";
+    hint.textContent = "Open the love letter anytime 💌";
+    noBtn.style.pointerEvents = "none";
+    noBtn.style.filter = "grayscale(.25)";
+    showToast("Welcome back 💖");
+  } else {
+    statusPill.textContent = "Status: pending";
+  }
+
+  // ---------- Romantic music (WebAudio music box) ----------
+  // Browsers require user gesture to start audio.
+  let audioCtx = null;
+  let playing = false;
+  let tickTimer = null;
+
+  function ensureAudio() {
+    if (!audioCtx) {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+  }
+
+  // Tiny “music box” arpeggio: soft sine + triangle, low volume
+  const progression = [
+    [261.63, 329.63, 392.00], // C major
+    [293.66, 369.99, 440.00], // Dm-ish
+    [329.63, 415.30, 493.88], // Em-ish
+    [349.23, 440.00, 523.25], // F major
+  ];
+
+  function playNote(freq, when, dur=0.16) {
+    const osc = audioCtx.create
