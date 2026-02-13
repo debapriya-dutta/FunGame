@@ -1,33 +1,41 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Will you be my Valentine? 💘</title>
 
   <style>
     :root{
-      --bg1:#ff9a9e; --bg2:#fad0c4; --bg3:#fbc2eb;
+      --bg1:#ff9a9e;
+      --bg2:#fad0c4;
+      --bg3:#fbc2eb;
       --card:rgba(255,255,255,.92);
-      --text:#2b2b2b; --muted:rgba(0,0,0,.62);
-      --yes:#358717; --no:#ff3b5c;
+      --text:#2b2b2b;
+      --muted:rgba(0,0,0,.62);
+      --yes:#358717;
+      --no:#ff3b5c;
       --shadow:0 22px 60px rgba(0,0,0,.18);
       --ring:0 0 0 4px rgba(255,59,92,.22);
     }
     *{box-sizing:border-box}
     body{
-      margin:0; height:100vh;
-      display:flex; align-items:center; justify-content:center;
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-      color:var(--text); overflow:hidden;
+      margin:0;
+      height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+      color:var(--text);
+      overflow:hidden;
       background:
         radial-gradient(1200px 800px at 15% 10%, rgba(255,255,255,.35), transparent 55%),
         radial-gradient(900px 650px at 85% 20%, rgba(255,255,255,.25), transparent 55%),
-        linear-gradient(135deg, var(--bg1), var(--bg2), var(--bg3));
+        linear-gradient(135deg,var(--bg1),var(--bg2),var(--bg3));
     }
 
     .card{
-      width:min(720px, 92vw);
+      width:min(720px,92vw);
       background:var(--card);
       border-radius:26px;
       padding:28px 22px 22px;
@@ -37,36 +45,44 @@
       border:1px solid rgba(0,0,0,.05);
     }
 
-    /* Shimmer overlay MUST NOT block clicks */
+    /* shimmer - IMPORTANT: pointer-events none so it never blocks clicks */
     .card::before{
       content:"";
       position:absolute; inset:-80px;
-      background: linear-gradient(110deg, transparent 20%, rgba(255,255,255,.55) 35%, transparent 55%);
-      transform: translateX(-60%);
-      animation: shimmer 5.5s ease-in-out infinite;
-      pointer-events:none; /* IMPORTANT */
+      background:linear-gradient(110deg,transparent 20%,rgba(255,255,255,.55) 35%,transparent 55%);
+      transform:translateX(-60%);
+      animation:shimmer 5.5s ease-in-out infinite;
+      pointer-events:none;
       z-index:0;
     }
     @keyframes shimmer{
-      0%{ transform:translateX(-65%) rotate(8deg); opacity:.2; }
-      45%{ opacity:.35; }
-      100%{ transform:translateX(65%) rotate(8deg); opacity:.2; }
+      0%{transform:translateX(-65%) rotate(8deg); opacity:.2}
+      45%{opacity:.35}
+      100%{transform:translateX(65%) rotate(8deg); opacity:.2}
     }
 
-    header{display:flex; justify-content:space-between; gap:12px; position:relative; z-index:2}
+    header{display:flex; gap:12px; align-items:flex-start; position:relative; z-index:2}
     .titleWrap{flex:1}
-    h1{margin:0 0 6px; font-size: clamp(26px, 3.2vw, 42px); line-height:1.1;}
-    .subtitle{margin:0; font-size:15px; color:var(--muted);}
+    h1{margin:0 0 6px; font-size:clamp(26px,3.2vw,42px); line-height:1.1}
+    .subtitle{margin:0; font-size:15px; color:var(--muted)}
 
     .pillRow{
       margin-top:10px;
-      display:flex; flex-wrap:wrap; gap:8px; justify-content:center;
-      position:relative; z-index:2;
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      justify-content:center;
+      position:relative;
+      z-index:2;
     }
     .pill{
-      font-size:12px; padding:7px 10px; border-radius:999px;
-      background:rgba(255,255,255,.75); border:1px solid rgba(0,0,0,.06);
+      font-size:12px;
+      padding:7px 10px;
+      border-radius:999px;
+      background:rgba(255,255,255,.75);
+      border:1px solid rgba(0,0,0,.06);
       color:rgba(0,0,0,.65);
+      backdrop-filter:blur(8px);
     }
 
     .playground{
@@ -77,12 +93,12 @@
       background:
         radial-gradient(500px 280px at 25% 25%, rgba(255,59,92,.14), transparent 60%),
         radial-gradient(500px 300px at 75% 20%, rgba(53,135,23,.12), transparent 62%),
-        radial-gradient(900px 420px at 50% 120%, rgba(255,255,255,.65), rgba(255,255,255,.0)),
+        radial-gradient(900px 420px at 50% 120%, rgba(255,255,255,.65), rgba(255,255,255,0)),
         rgba(255,255,255,.55);
       overflow:hidden;
       border:1px solid rgba(0,0,0,.07);
       z-index:2;
-      touch-action:none; /* so pointer events behave nicely on mobile */
+      touch-action:none;
     }
 
     .btn{
@@ -93,58 +109,71 @@
       font-size:16px;
       cursor:pointer;
       user-select:none;
+      -webkit-tap-highlight-color:transparent;
       position:absolute;
-      transform: translate(var(--tx, 0px), var(--ty, 0px));
       transition: transform .08s ease, filter .12s ease, box-shadow .12s ease;
-      will-change: transform;
+      will-change:left,top,transform;
+      z-index:3;
     }
-    .btn:active{ transform: translate(var(--tx, 0px), var(--ty, 0px)) scale(.98); }
-    .btn:focus-visible{ outline:none; box-shadow: var(--ring); }
+    .btn:active{transform:scale(.98)}
+    .btn:focus-visible{outline:none; box-shadow:var(--ring)}
 
     .yesBtn{
-      left:30%; top:64%;
-      background:var(--yes); color:white;
+      left:30%;
+      top:64%;
+      background:var(--yes);
+      color:#fff;
       box-shadow:0 14px 30px rgba(53,135,23,.28);
-      z-index:3;
     }
     .noBtn{
-      left:58%; top:64%;
-      background:var(--no); color:white;
+      left:58%;
+      top:64%;
+      background:var(--no);
+      color:#fff;
       box-shadow:0 14px 30px rgba(255,59,92,.28);
-      z-index:3;
     }
 
-    .result{margin-top:12px; min-height:28px; font-size:18px; font-weight:800; position:relative; z-index:2;}
-    .hint{margin-top:6px; font-size:12px; color:rgba(0,0,0,.55); position:relative; z-index:2;}
+    .result{margin-top:12px; min-height:28px; font-size:18px; font-weight:800; position:relative; z-index:2}
+    .hint{margin-top:6px; font-size:12px; color:rgba(0,0,0,.55); position:relative; z-index:2}
 
     .toast{
-      position:absolute; left:50%; top:14px; transform:translateX(-50%);
-      background:rgba(0,0,0,.75); color:#fff;
-      padding:8px 12px; border-radius:12px; font-size:13px;
-      opacity:0; pointer-events:none;
-      transition: opacity .18s ease, transform .18s ease;
-      z-index:50; white-space:nowrap;
+      position:absolute;
+      left:50%;
+      top:14px;
+      transform:translateX(-50%);
+      background:rgba(0,0,0,.75);
+      color:#fff;
+      padding:8px 12px;
+      border-radius:12px;
+      font-size:13px;
+      opacity:0;
+      pointer-events:none;
+      transition:opacity .18s ease, transform .18s ease;
+      z-index:50;
+      white-space:nowrap;
     }
-    .toast.show{ opacity:1; transform:translateX(-50%) translateY(2px); }
+    .toast.show{opacity:1; transform:translateX(-50%) translateY(2px)}
 
     .confetti{
-      position:fixed; width:10px; height:10px;
-      pointer-events:none; opacity:1;
-      animation: fall 1.25s linear forwards;
+      position:fixed;
+      pointer-events:none;
+      opacity:1;
+      animation:fall 1.25s linear forwards;
       z-index:999;
     }
     @keyframes fall{
-      0%{ transform: translateY(0) rotate(0deg); opacity:1; }
-      100%{ transform: translateY(110vh) rotate(720deg); opacity:0; }
+      0%{transform:translateY(0) rotate(0deg); opacity:1}
+      100%{transform:translateY(110vh) rotate(720deg); opacity:0}
     }
     .heartBurst{
-      position:fixed; pointer-events:none;
-      animation: heartUp 1.35s ease forwards;
+      position:fixed;
+      pointer-events:none;
+      animation:heartUp 1.35s ease forwards;
       z-index:999;
     }
     @keyframes heartUp{
-      0%{ transform: translateY(0) scale(1); opacity:1; }
-      100%{ transform: translateY(-110vh) rotate(240deg) scale(1.15); opacity:0; }
+      0%{transform:translateY(0) scale(1); opacity:1}
+      100%{transform:translateY(-110vh) rotate(240deg) scale(1.15); opacity:0}
     }
   </style>
 </head>
@@ -156,7 +185,7 @@
     <header>
       <div class="titleWrap">
         <h1 id="title">Will you be my Valentine? 💘🥹</h1>
-        <p class="subtitle" id="subtitle">Just one cute question for you 💌✨</p>
+        <p class="subtitle" id="subtitle">Just a cute little question for you 💌✨</p>
       </div>
     </header>
 
@@ -166,17 +195,18 @@
     </div>
 
     <div class="playground" id="playground" aria-label="Buttons area">
-      <button class="btn yesBtn" id="yesBtn" type="button">YES 💖</button>
-      <button class="btn noBtn" id="noBtn" type="button">NO 🙈</button>
+      <button class="btn yesBtn" id="yesBtn">YES 💖</button>
+      <button class="btn noBtn" id="noBtn">NO 🙈</button>
     </div>
 
     <div class="result" id="result"></div>
-    <div class="hint" id="hint">Move closer to “NO”… it runs away 😄💨</div>
+    <div class="hint" id="hint">Move closer to “NO”… it will keep running 😄💨</div>
   </div>
 
 <script>
 document.addEventListener("DOMContentLoaded", () => {
-  console.log("JS loaded ✅"); // if you don't see this, JS isn't running. [1](https://learn.microsoft.com/en-us/microsoft-edge/devtools/console/console-debug-javascript)
+  // requestAnimationFrame is best for smooth UI animation (per-frame visual update). [1](https://microsoft.sharepoint.com/teams/CalcCanvasIDC/_layouts/15/Doc.aspx?sourcedoc=%7B27199752-50AB-45B8-B38F-C72CA226EB05%7D&file=Interactivity%20overview.pptx&action=edit&mobileredirect=true&DefaultItemOpen=1)
+  console.log("Valentine page JS loaded ✅");
 
   const yesBtn = document.getElementById("yesBtn");
   const noBtn = document.getElementById("noBtn");
@@ -187,118 +217,120 @@ document.addEventListener("DOMContentLoaded", () => {
   const statusPill = document.getElementById("statusPill");
   const hint = document.getElementById("hint");
 
-  // Safety check (prevents silent failure if IDs are wrong)
   if (!yesBtn || !noBtn || !playground) {
     console.error("Missing elements. Check IDs: yesBtn/noBtn/playground");
     return;
   }
 
-  // Toast helper
-  let toastTimer;
+  // ---------- Toast ----------
+  let toastTimer = null;
   function showToast(msg){
+    if(!msg) return;
     toast.textContent = msg;
     toast.classList.add("show");
     clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => toast.classList.remove("show"), 900);
+    toastTimer = setTimeout(()=>toast.classList.remove("show"), 900);
   }
 
-  // NO runaway config
-  let noTries = 0;
-  const tease = ["Oops 😇","Nice try 😌","Hehe… not today 💞","I’m shy 🙈","Too slow 😄","Are you sure? 🥺","Try YES instead 😘"];
-
-  const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
-
-  // Move NO by updating CSS vars (translate)
-  function setNoOffset(x, y){
-    noBtn.style.setProperty("--tx", x + "px");
-    noBtn.style.setProperty("--ty", y + "px");
+  // ---------- Confetti & Hearts ----------
+  function launchConfetti(){
+    const colors = ["#ff3b5c","#358717","#ffd166","#6c63ff","#00c2ff","#ff8fab"];
+    for(let i=0;i<40;i++){
+      const c = document.createElement("div");
+      c.className = "confetti";
+      c.style.left = (Math.random()*100) + "vw";
+      c.style.top  = (-6 - Math.random()*12) + "vh";
+      c.style.background = colors[Math.floor(Math.random()*colors.length)];
+      c.style.borderRadius = (Math.random()>.5 ? "2px":"999px");
+      c.style.width  = (8 + Math.random()*8) + "px";
+      c.style.height = (8 + Math.random()*10) + "px";
+      c.style.animationDuration = (1.0 + Math.random()*0.6) + "s";
+      document.body.appendChild(c);
+      setTimeout(()=>c.remove(), 1700);
+    }
   }
-
-  function randomOffset(){
-    const pg = playground.getBoundingClientRect();
-    const nb = noBtn.getBoundingClientRect();
-    const maxX = pg.width - nb.width - 12;
-    const maxY = pg.height - nb.height - 12;
-    const x = Math.random() * maxX - (pg.width*0.20); // centered-ish
-    const y = Math.random() * maxY - (pg.height*0.20);
-    return {x, y};
-  }
-
-  // push-away move (mouse comes closer)
-  function pushAway(px, py){
-    const pg = playground.getBoundingClientRect();
-    const nb = noBtn.getBoundingClientRect();
-
-    const bx = nb.left + nb.width/2;
-    const by = nb.top + nb.height/2;
-
-    let dx = bx - px;
-    let dy = by - py;
-    const len = Math.hypot(dx, dy) || 1;
-    dx /= len; dy /= len;
-
-    // escape distance (bigger when tries increase)
-    const escape = 120 + Math.min(120, noTries * 10);
-
-    // compute new target inside playground area
-    const localX = (bx - pg.left) + dx * escape;
-    const localY = (by - pg.top) + dy * escape;
-
-    const maxX = pg.width - nb.width - 12;
-    const maxY = pg.height - nb.height - 12;
-
-    // convert to translate offsets relative to initial left/top position
-    // we approximate by setting translate to (target - originalLeftWithinPg)
-    const originalLeft = (parseFloat(getComputedStyle(noBtn).left) / 100) * pg.width; // since left is %
-    const originalTop  = (parseFloat(getComputedStyle(noBtn).top)  / 100) * pg.height;
-
-    const tx = clamp(localX - originalLeft, -originalLeft + 6, maxX - originalLeft);
-    const ty = clamp(localY - originalTop , -originalTop + 6, maxY - originalTop);
-
-    setNoOffset(tx + (Math.random()-0.5)*30, ty + (Math.random()-0.5)*30);
-  }
-
-  // Place NO initially
-  const init = randomOffset();
-  setNoOffset(init.x, init.y);
-
-  // Make NO run when pointer gets close (use pointer events for mobile+desktop) [6](https://developer.mozilla.org/en-US/docs/Web/API/Element/mousemove_event)[7](https://stackoverflow.com/questions/37731975/mousemove-event-not-firing-on-page-element-or-document)
-  let last = 0;
-  function onPointerMove(e){
-    const now = performance.now();
-    if (now - last < 16) return; // throttle
-    last = now;
-
-    const nb = noBtn.getBoundingClientRect();
-    const cx = nb.left + nb.width/2;
-    const cy = nb.top + nb.height/2;
-    const dist = Math.hypot(e.clientX - cx, e.clientY - cy);
-
-    const danger = 190; // increase => runs sooner
-    if (dist < danger){
-      pushAway(e.clientX, e.clientY);
-      if (Math.random() < 0.05) showToast("Nopeee 🙈💨");
+  function heartBurst(){
+    const emojis = ["💖","💞","💘","💝","🌷","✨","🥰"];
+    for(let i=0;i<20;i++){
+      const h = document.createElement("div");
+      h.className = "heartBurst";
+      h.textContent = emojis[Math.floor(Math.random()*emojis.length)];
+      h.style.left = (Math.random()*100) + "vw";
+      h.style.top  = (78 + Math.random()*18) + "vh";
+      h.style.fontSize = (16 + Math.random()*22) + "px";
+      h.style.animationDuration = (1.0 + Math.random()*0.6) + "s";
+      document.body.appendChild(h);
+      setTimeout(()=>h.remove(), 1600);
     }
   }
 
-  playground.addEventListener("pointermove", onPointerMove);
+  // ---------- YES click ----------
+  yesBtn.addEventListener("click", () => {
+    statusPill.textContent = "Status: YES 💖";
+    result.textContent = "YAY! You said YES 💞";
+    result.style.color = "#0d6b3a";
+    hint.textContent = "Awww 💖✨";
+    showToast("Best answer 😌💘");
+    launchConfetti();
+    heartBurst();
 
-  // On touch start, also trigger escape immediately
-  playground.addEventListener("pointerdown", (e) => {
-    // pointerdown on playground helps mobile where move is less frequent
-    onPointerMove(e);
+    // Stop NO from running after YES
+    noBtn.style.pointerEvents = "none";
+    noBtn.style.filter = "grayscale(.25)";
   });
 
-  // Clicking NO: tease + jump away
+  // ---------- NO continuous runaway (never disappears) ----------
+  let noTries = 0;
+  const tease = [
+    "Oops 😇","Nice try 😌","Hehe… not today 💞","I’m shy 🙈","Too slow 😄",
+    "Are you sure? 🥺","Try YES instead 😘","Still chasing? 😳","Nopeee 🙈💨","Okay okay… 😅"
+  ];
+
+  // Current NO position (inside playground, pixels)
+  let noX = 0, noY = 0;
+
+  // Mouse position relative to playground
+  let mouseX = -9999, mouseY = -9999;
+
+  const padding = 10;
+  const dangerRadius = 190; // closer => runs more (increase for more sensitive)
+  const maxSpeed = 14;      // increase for faster running
+  const wobble = 0.9;       // small wobble so it feels alive
+
+  const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
+
+  function placeNoRandom(){
+    const pg = playground.getBoundingClientRect();
+    const nb = noBtn.getBoundingClientRect();
+    const maxX = pg.width  - nb.width  - padding;
+    const maxY = pg.height - nb.height - padding;
+    noX = padding + Math.random() * Math.max(0, maxX);
+    noY = padding + Math.random() * Math.max(0, maxY);
+    noBtn.style.left = noX + "px";
+    noBtn.style.top  = noY + "px";
+  }
+
+  // Initialize NO position once layout is ready
+  requestAnimationFrame(placeNoRandom);
+
+  // Track pointer inside playground (pointer events handle mouse + touch)
+  playground.addEventListener("pointermove", (e) => {
+    const pg = playground.getBoundingClientRect();
+    mouseX = e.clientX - pg.left;
+    mouseY = e.clientY - pg.top;
+  });
+
+  playground.addEventListener("pointerleave", () => {
+    mouseX = -9999;
+    mouseY = -9999;
+  });
+
+  // Tapping NO increases tries + teasing
   noBtn.addEventListener("pointerdown", (e) => {
     e.preventDefault();
     noTries++;
     triesPill.textContent = "No tries: " + noTries;
-    showToast(tease[noTries % tease.length]);
-    pushAway(e.clientX, e.clientY);
-
-    // make it eventually surrender
-    if (noTries === 8) hint.textContent = "Awww you’re persistent 😳💞";
+    showToast(tease[Math.min(tease.length-1, noTries-1)]);
     if (noTries >= 12){
       noBtn.textContent = "Okay… YES 🥹💘";
       noBtn.addEventListener("click", () => yesBtn.click(), { once:true });
@@ -306,48 +338,52 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // YES click should always work
-  yesBtn.addEventListener("click", () => {
-    statusPill.textContent = "Status: YES 💖";
-    result.textContent = "YAY! You said YES 💞✨";
-    result.style.color = "#0d6b3a";
-    hint.textContent = "Awww 🥰 (try refreshing—YES stays true in your heart) 💌";
+  // Continuous animation loop (smooth and persistent)
+  function animateRunaway(){
+    const pg = playground.getBoundingClientRect();
+    const nb = noBtn.getBoundingClientRect();
 
-    launchConfetti();
-    heartBurst();
-  });
+    const maxX = pg.width  - nb.width  - padding;
+    const maxY = pg.height - nb.height - padding;
 
-  function heartBurst(){
-    const emojis = ["💖","💞","💘","💝","🌷","✨","🥰"];
-    for (let i=0;i<20;i++){
-      const h = document.createElement("div");
-      h.className = "heartBurst";
-      h.textContent = emojis[Math.floor(Math.random()*emojis.length)];
-      h.style.left = (Math.random()*100) + "vw";
-      h.style.top = (78 + Math.random()*18) + "vh";
-      h.style.fontSize = (16 + Math.random()*22) + "px";
-      h.style.animationDuration = (1.0 + Math.random()*0.6) + "s";
-      document.body.appendChild(h);
-      setTimeout(() => h.remove(), 1600);
+    // Center of NO button (relative to playground)
+    const btnCX = noX + nb.width/2;
+    const btnCY = noY + nb.height/2;
+
+    const dx = btnCX - mouseX;
+    const dy = btnCY - mouseY;
+    const dist = Math.hypot(dx, dy);
+
+    // Only run if mouse is near
+    if (dist < dangerRadius){
+      const len = dist || 1;
+      const ux = dx / len;
+      const uy = dy / len;
+
+      // push factor: closer => stronger
+      const push = clamp((dangerRadius - dist) / dangerRadius, 0, 1);
+      const speed = 4 + push * (maxSpeed - 4);
+
+      noX += ux * speed;
+      noY += uy * speed;
+
+      // tiny wobble
+      noX += (Math.random() - 0.5) * wobble;
+      noY += (Math.random() - 0.5) * wobble;
+
+      // keep inside playground (never disappear)
+      noX = clamp(noX, padding, Math.max(padding, maxX));
+      noY = clamp(noY, padding, Math.max(padding, maxY));
+
+      // apply
+      noBtn.style.left = noX + "px";
+      noBtn.style.top  = noY + "px";
     }
+
+    requestAnimationFrame(animateRunaway);
   }
 
-  function launchConfetti(){
-    const colors = ["#ff3b5c","#358717","#ffd166","#6c63ff","#00c2ff","#ff8fab"];
-    for (let i=0;i<40;i++){
-      const c = document.createElement("div");
-      c.className = "confetti";
-      c.style.left = (Math.random()*100) + "vw";
-      c.style.top = (-6 - Math.random()*12) + "vh";
-      c.style.background = colors[Math.floor(Math.random()*colors.length)];
-      c.style.borderRadius = (Math.random()>.5 ? "2px" : "999px");
-      c.style.width = (8 + Math.random()*8) + "px";
-      c.style.height = (8 + Math.random()*10) + "px";
-      c.style.animationDuration = (1.0 + Math.random()*0.6) + "s";
-      document.body.appendChild(c);
-      setTimeout(() => c.remove(), 1700);
-    }
-  }
+  requestAnimationFrame(animateRunaway);
 });
 </script>
 </body>
