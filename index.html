@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>No escape</title>
+  <title>My Valentine?</title>
   <style>
     :root{
       --bg1:#ff9a9e;
@@ -12,12 +12,11 @@
       --card:rgba(255,255,255,.92);
       --text:#2b2b2b;
       --muted:rgba(0,0,0,.62);
-      --yes:#358717; /* improved contrast green */ /* [1](https://microsoft.sharepoint.com/teams/STCARelevane/WPR/_layouts/15/Doc.aspx?sourcedoc=%7B35FC2306-C640-40D4-AED8-18F9C9DAF83B%7D&file=FY25%20PA%20Uber%20Deck.pptx&action=edit&mobileredirect=true&DefaultItemOpen=1) */
+      --yes:#358717;
       --no:#ff3b5c;
       --shadow:0 22px 60px rgba(0,0,0,.18);
       --ring:0 0 0 4px rgba(255,59,92,.22);
     }
-
     *{box-sizing:border-box}
     body{
       margin:0;
@@ -40,11 +39,12 @@
       position:fixed;
       left:0; top:0;
       pointer-events:none;
-      opacity:.0;
+      opacity:0;
       transform:translateY(0) scale(1);
       animation: bgFloat 10s linear forwards;
       filter: drop-shadow(0 10px 15px rgba(0,0,0,.08));
       will-change: transform, opacity;
+      z-index:0;
     }
     @keyframes bgFloat{
       0%{ opacity:0; transform:translateY(20vh) scale(.8) rotate(-10deg); }
@@ -62,8 +62,8 @@
       position:relative;
       overflow:hidden;
       border:1px solid rgba(0,0,0,.05);
+      z-index:2;
     }
-
     /* cute shimmer */
     .card::before{
       content:"";
@@ -87,7 +87,6 @@
       position:relative;
       z-index:2;
     }
-
     .titleWrap{flex:1}
     h1{
       margin:0 0 6px;
@@ -111,7 +110,6 @@
       position:relative;
       z-index:2;
     }
-
     .pill{
       font-size:12px;
       padding:7px 10px;
@@ -145,11 +143,7 @@
     }
     .iconBtn:active{ transform: scale(.98); }
     .iconBtn:focus-visible{ outline:none; box-shadow: var(--ring), 0 10px 20px rgba(0,0,0,.08); }
-
-    .icon{
-      font-size:18px;
-      transform: translateY(-1px);
-    }
+    .icon{ font-size:18px; transform: translateY(-1px); }
 
     .playground{
       position:relative;
@@ -238,6 +232,7 @@
       animation: heartUp 1.35s ease forwards;
       will-change: transform, opacity;
       filter: drop-shadow(0 10px 14px rgba(0,0,0,.1));
+      z-index:999;
     }
     @keyframes heartUp{
       0%{ transform: translateY(0) scale(1); opacity:1; }
@@ -245,11 +240,11 @@
     }
     .confetti{
       position:fixed;
-      width:10px; height:10px;
       pointer-events:none;
       opacity:1;
       animation: fall 1.25s linear forwards;
       will-change: transform, opacity;
+      z-index:999;
     }
     @keyframes fall{
       0%{ transform: translateY(0) rotate(0deg); opacity:1; }
@@ -265,7 +260,7 @@
       align-items:center;
       justify-content:center;
       padding:18px;
-      z-index:999;
+      z-index:9999;
     }
     .modal.show{ display:flex; }
     .letter{
@@ -353,17 +348,20 @@
     @media (prefers-reduced-motion: reduce){
       .card::before, .bg-heart, .heartBurst, .confetti{ animation: none !important; }
       .btn{ transition:none !important; }
+      /* Keep confetti/hearts visible (not animated) so user still "sees" something */
+      .confetti, .heartBurst { opacity:1 !important; }
     }
   </style>
 </head>
+
 <body>
   <div class="card" role="application" aria-label="Valentine page">
     <div class="toast" id="toast" aria-live="polite"></div>
 
     <header>
       <div class="titleWrap">
-        <h1 id="title">My Valentine?</h1>
-        <p class="subtitle" id="subtitle">I made this tiny page just for you 💌</p>
+        <h1 id="title">My Valentine? 💘</h1>
+        <p class="subtitle" id="subtitle">I have a tiny cute question for you 🥹💌</p>
       </div>
 
       <div class="controls">
@@ -388,7 +386,7 @@
     </div>
 
     <div class="result" id="result"></div>
-    <div class="hint" id="hint">Tip: On mobile, try tapping “NO”… if you can 😄</div>
+    <div class="hint" id="hint">Tip: Try to catch “NO”… it runs when you come closer 😄</div>
   </div>
 
   <!-- Love letter modal -->
@@ -424,12 +422,12 @@
   </div>
 
 <script>
-  // ---------- Personalization (link params) ----------
+  // ---------- Elements ----------
   const qs = new URLSearchParams(location.search);
   const name = (qs.get("name") || "").trim();
-  const customMsg = (qs.get("msg") || "").trim(); // optional: ?msg=...
-  const customPS = (qs.get("ps") || "").trim();   // optional: ?ps=...
-  const photoSrc = (qs.get("photo") || "").trim(); // optional: ?photo=photo.jpg
+  const customMsg = (qs.get("msg") || "").trim();  // optional
+  const customPS  = (qs.get("ps")  || "").trim();  // optional
+  const photoSrc  = (qs.get("photo") || "").trim(); // optional
 
   const title = document.getElementById("title");
   const subtitle = document.getElementById("subtitle");
@@ -444,7 +442,6 @@
   const playground = document.getElementById("playground");
 
   const toast = document.getElementById("toast");
-
   const modal = document.getElementById("modal");
   const closeModal = document.getElementById("closeModal");
   const letterTitle = document.getElementById("letterTitle");
@@ -459,27 +456,26 @@
   const musicIcon = document.getElementById("musicIcon");
   const resetBtn = document.getElementById("resetBtn");
 
-  const STORE_KEY = "valentine_yes_v2";
+  const STORE_KEY = "valentine_yes_v3";
 
-  // Title/subtitle personalization
+  // ---------- Personalization ----------
   if (name) {
-    title.textContent = `${name}, will you be my Valentine?`;
-    subtitle.textContent = `Hey ${name}… I have a tiny question 🥹`;
+    title.textContent = `Hey ${name}… will you be my Valentine? 💘🥹`;
+    subtitle.textContent = `Just one cute question for you, ${name} 💌✨`;
     letterTitle.textContent = `For ${name} 💌`;
+  } else {
+    title.textContent = `Will you be my Valentine? 💘🥹`;
   }
-
-  // Love letter text personalization
   if (customMsg) letterText.textContent = customMsg;
   if (customPS) psLine.textContent = customPS;
 
-  // Optional photo: default file name you can add to repo
-  // If user provides ?photo=..., use it; else try "photo.jpg" silently
+  // Optional photo reveal (place photo.jpg in repo OR pass ?photo=...)
   const tryPhoto = photoSrc || "photo.jpg";
   photoImg.src = tryPhoto;
   photoImg.onload = () => { photoImg.style.display = "block"; photoFallback.style.display = "none"; };
   photoImg.onerror = () => { /* fallback stays */ };
 
-  // ---------- Cute countdown (next Feb 14) ----------
+  // ---------- Countdown (next Feb 14) ----------
   function nextValentineDate() {
     const now = new Date();
     const y = now.getFullYear();
@@ -507,20 +503,19 @@
   tickCountdown();
   setInterval(tickCountdown, 1000);
 
-  // ---------- Toast helper ----------
+  // ---------- Toast ----------
   let toastTimer = null;
   function showToast(msg) {
     if (!msg) return;
     toast.textContent = msg;
     toast.classList.add("show");
     clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => toast.classList.remove("show"), 850);
+    toastTimer = setTimeout(() => toast.classList.remove("show"), 900);
   }
 
-  // ---------- Background floating hearts ----------
-  const bgHearts = ["💗","💖","💘","💝","💞","🌸"];
+  // ---------- Floating background hearts ----------
+  const bgHearts = ["💗","💖","💘","💝","💞","🌸","✨"];
   function spawnBgHeart() {
-    // Reduce motion preference: stop spawning
     if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     const el = document.createElement("div");
     el.className = "bg-heart";
@@ -528,14 +523,13 @@
     el.style.left = (Math.random()*100) + "vw";
     el.style.top = (80 + Math.random()*30) + "vh";
     el.style.fontSize = (16 + Math.random()*20) + "px";
-    el.style.opacity = "0";
     el.style.animationDuration = (8 + Math.random()*6) + "s";
     document.body.appendChild(el);
     setTimeout(() => el.remove(), 14000);
   }
   setInterval(spawnBgHeart, 650);
 
-  // ---------- Runaway NO button ----------
+  // ---------- Runaway NO button (closer = runs more) ----------
   let noTries = 0;
   const tease = [
     "Oops 😇",
@@ -549,7 +543,6 @@
     "One more time? 😅",
     "Fine… I’m getting tired 😵‍💫"
   ];
-
   const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
 
   function moveNoButton(awayX=null, awayY=null, force=false) {
@@ -563,7 +556,6 @@
     let x = Math.random() * maxX + padding/2;
     let y = Math.random() * maxY + padding/2;
 
-    // push away from pointer if provided
     if (awayX != null && awayY != null) {
       const relX = awayX - pg.left;
       const relY = awayY - pg.top;
@@ -571,8 +563,8 @@
       const dy = y - relY;
       const len = Math.hypot(dx, dy) || 1;
 
-      // escape distance grows slightly with tries
-      const escape = 120 + Math.min(80, noTries * 6);
+      // stronger escape + grows with tries
+      const escape = 150 + Math.min(120, noTries * 7);
       x = relX + (dx/len)*escape + (Math.random()-0.5)*70;
       y = relY + (dy/len)*escape + (Math.random()-0.5)*70;
 
@@ -580,11 +572,10 @@
       y = clamp(y, padding, maxY);
     }
 
-    // When tries are high, slow down a bit so user can finish the story
+    // when tries are high, let it be more catchable
     if (noTries >= 10 && !force) {
-      // pull it closer to center a little
-      x = (x + pg.width*0.45)/2;
-      y = (y + pg.height*0.55)/2;
+      x = (x + pg.width*0.48) / 2;
+      y = (y + pg.height*0.62) / 2;
     }
 
     noBtn.style.left = x + "px";
@@ -593,16 +584,26 @@
 
   window.addEventListener("load", () => moveNoButton(null, null, true));
 
+  // Make NO run when mouse/finger comes closer (bigger danger radius)
+  let lastRun = 0;
   function handlePointerMove(e) {
     if (isYesLocked()) return;
+
+    const now = performance.now();
+    if (now - lastRun < 16) return; // ~60fps throttle
+    lastRun = now;
+
     const nb = noBtn.getBoundingClientRect();
     const px = e.clientX, py = e.clientY;
     const cx = nb.left + nb.width/2;
     const cy = nb.top  + nb.height/2;
     const dist = Math.hypot(px - cx, py - cy);
 
-    // sensitivity
-    if (dist < 130) moveNoButton(px, py);
+    const danger = 180; // <-- closer sensitivity (increase = runs sooner)
+    if (dist < danger) {
+      moveNoButton(px, py);
+      if (Math.random() < 0.06) showToast("Nopeee 🙈💨");
+    }
   }
 
   playground.addEventListener("mousemove", handlePointerMove);
@@ -612,24 +613,29 @@
     handlePointerMove({ clientX: t.clientX, clientY: t.clientY });
   }, { passive:true });
 
-  // NO button tap -> tease, move away, and eventually "gives up"
+  // Make it run immediately when user touches the playground (mobile)
+  playground.addEventListener("touchstart", (e) => {
+    const t = e.touches && e.touches[0];
+    if (!t) return;
+    handlePointerMove({ clientX: t.clientX, clientY: t.clientY });
+  }, { passive:true });
+
+  // NO tap -> tease + move away + eventually surrenders
   noBtn.addEventListener("pointerdown", (e) => {
     if (isYesLocked()) return;
     e.preventDefault();
+
     noTries++;
     triesPill.textContent = `No tries: ${noTries}`;
     showToast(tease[Math.min(tease.length-1, noTries-1)]);
 
-    // evolve behavior
-    if (noTries === 6) hint.textContent = "Tip: Your persistence is cute 😳";
-    if (noTries === 10) hint.textContent = "Okay… the NO button is getting tired 😅";
+    if (noTries === 6) hint.textContent = "Awww you’re trying so hard 😳💞";
+    if (noTries === 10) hint.textContent = "Okay… NO is getting tired 😅";
     if (noTries >= 12) {
-      // surrender: NO becomes YES-ish
-      noBtn.textContent = "Okay… YES 🥹";
+      noBtn.textContent = "Okay… YES 🥹💘";
       noBtn.style.background = "linear-gradient(135deg, #ff3b5c, #ff7aa0)";
       noBtn.style.boxShadow = "0 14px 30px rgba(255,59,92,.30)";
-      showToast("Alright… you win 😌💘");
-      // Next tap on it triggers YES
+      showToast("Alright… you win 😌💖");
       noBtn.addEventListener("click", triggerYesOnce, { once:true });
     }
 
@@ -640,11 +646,9 @@
   function isYesLocked() {
     return localStorage.getItem(STORE_KEY) === "1";
   }
-
   function setYesLocked() {
     localStorage.setItem(STORE_KEY, "1");
   }
-
   function clearYesLocked() {
     localStorage.removeItem(STORE_KEY);
   }
@@ -653,7 +657,6 @@
     if (isYesLocked()) return;
     triggerYes();
   }
-
   yesBtn.addEventListener("click", triggerYesOnce);
 
   function triggerYes() {
@@ -661,25 +664,25 @@
     statusPill.textContent = "Status: YES 💖";
     result.textContent = name ? `YAY! ${name} said YES 💞` : "YAY! You said YES 💞";
     result.style.color = "#0d6b3a";
-    hint.textContent = "You just unlocked the love letter 💌";
+    hint.textContent = "You just unlocked the love letter 💌✨";
 
-    // freeze NO so it stops escaping
+    // stop NO escaping
     noBtn.style.pointerEvents = "none";
     noBtn.style.filter = "grayscale(.25)";
 
-    // confetti + hearts
+    // effects first (so they appear even if modal opens)
     launchConfetti();
     heartBurst();
 
-    // open love letter
-    openModal();
+    // open love letter after a tiny delay so animations paint
+    setTimeout(openModal, 120);
 
-    // subtle sparkle background
+    // extra cute background hearts
     for (let i=0;i<6;i++) spawnBgHeart();
   }
 
   function heartBurst() {
-    const emojis = ["💖","💞","💘","💝","🌷","✨"];
+    const emojis = ["💖","💞","💘","💝","🌷","✨","🥰"];
     for (let i=0;i<22;i++){
       const h = document.createElement("div");
       h.className = "heartBurst";
@@ -724,29 +727,24 @@
 
   // ---------- Share / copy link ----------
   function buildShareLink() {
-    // Keep name/msg/ps/photo params, but drop reset
     const u = new URL(location.href);
     u.searchParams.delete("reset");
     return u.toString();
   }
-
   copyBtn.addEventListener("click", async () => {
     const link = buildShareLink();
     try{
       await navigator.clipboard.writeText(link);
       showToast("Link copied 💌");
     }catch{
-      // fallback
       prompt("Copy this link:", link);
     }
   });
-
   shareBtn.addEventListener("click", async () => {
     const link = buildShareLink();
     const shareData = { title: "My Valentine?", text: "I have a tiny question 💞", url: link };
     if (navigator.share) {
-      try { await navigator.share(shareData); }
-      catch { /* user canceled */ }
+      try { await navigator.share(shareData); } catch {}
     } else {
       try{
         await navigator.clipboard.writeText(link);
@@ -757,15 +755,14 @@
     }
   });
 
-  // ---------- Reset button ----------
+  // ---------- Reset ----------
   resetBtn.addEventListener("click", () => {
     clearYesLocked();
-    // keep personalization params
     showToast("Reset done 🔁");
     setTimeout(() => location.reload(), 250);
   });
 
-  // ---------- Restore state if already YES ----------
+  // ---------- Restore YES state ----------
   if (isYesLocked()) {
     statusPill.textContent = "Status: YES 💖";
     result.textContent = name ? `Still YES 💞 (Welcome back, ${name}!)` : "Still YES 💞 (Welcome back!)";
@@ -779,7 +776,7 @@
   }
 
   // ---------- Romantic music (WebAudio music box) ----------
-  // Browsers require user gesture to start audio.
+  // Must be started by user gesture (button click). This version is extra-safe.
   let audioCtx = null;
   let playing = false;
   let tickTimer = null;
@@ -790,13 +787,72 @@
     }
   }
 
-  // Tiny “music box” arpeggio: soft sine + triangle, low volume
   const progression = [
-    [261.63, 329.63, 392.00], // C major
+    [261.63, 329.63, 392.00], // C
     [293.66, 369.99, 440.00], // Dm-ish
     [329.63, 415.30, 493.88], // Em-ish
-    [349.23, 440.00, 523.25], // F major
+    [349.23, 440.00, 523.25], // F
   ];
 
   function playNote(freq, when, dur=0.16) {
-    const osc = audioCtx.create
+    const osc = audioCtx.createOscillator();
+    const osc2 = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+
+    osc.type = "sine";
+    osc2.type = "triangle";
+    osc.frequency.value = freq;
+    osc2.frequency.value = freq * 2;
+
+    gain.gain.setValueAtTime(0.0001, when);
+    gain.gain.exponentialRampToValueAtTime(0.06, when + 0.02);
+    gain.gain.exponentialRampToValueAtTime(0.0001, when + dur);
+
+    osc.connect(gain);
+    osc2.connect(gain);
+    gain.connect(audioCtx.destination);
+
+    osc.start(when);
+    osc2.start(when);
+    osc.stop(when + dur + 0.02);
+    osc2.stop(when + dur + 0.02);
+  }
+
+  async function startMusic() {
+    ensureAudio();
+    try {
+      if (audioCtx.state === "suspended") await audioCtx.resume();
+    } catch (e) {
+      showToast("Tap again for music 🎵");
+      return;
+    }
+    if (audioCtx.state !== "running") {
+      showToast("Tap again for music 🎵");
+      return;
+    }
+
+    playing = true;
+    musicIcon.textContent = "🎶";
+    showToast("Music on 🎵");
+
+    let step = 0;
+    const tempo = 0.22;
+    tickTimer = setInterval(() => {
+      if (!audioCtx || audioCtx.state !== "running") return;
+      const chord = progression[Math.floor(step / 12) % progression.length];
+      const n = chord[step % 3];
+      const now = audioCtx.currentTime + 0.01;
+      playNote(n, now, 0.18);
+      step++;
+    }, tempo * 1000);
+  }
+
+  function stopMusic() {
+    playing = false;
+    musicIcon.textContent = "🎵";
+    showToast("Music off");
+    clearInterval(tickTimer);
+    tickTimer = null;
+  }
+
+  musicBtn.addEventListener
